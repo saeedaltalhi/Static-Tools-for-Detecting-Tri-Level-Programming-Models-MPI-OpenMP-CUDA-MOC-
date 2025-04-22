@@ -1,10 +1,10 @@
-# Static-Tools-for-Detecting-Tri-Level-Programming-Models-MPI-OpenMP-CUDA-MOC
+# Static-Tools-for-Detecting-Tri-Level-Programming-Models-MPI-OpenMP-CUDA(MOC)
 
 **Static analysis components for Tri-level programming model using MPI, OpenMP, and CUDA (MOC)**
 
 ---
 
-This repository contains the static components of a tool designed to assist in the **detection and analysis of hybrid parallel programming models** that integrate **MPI**, **OpenMP**, and **CUDA**. The tool supports static inspection of source code to aid in debugging, bottleneck identification, and correctness verification in high-performance computing (HPC) environments.
+This repository contains the **static components** of a tool designed to assist in the **detection and analysis of hybrid parallel programming models** that integrate **MPI**, **OpenMP**, and **CUDA**. The tool supports static inspection of source code to aid in debugging, bottleneck identification, and correctness verification in high-performance computing (HPC) environments.
 
 ---
 
@@ -14,7 +14,16 @@ Hybrid programming is increasingly used in modern HPC applications to maximize p
 
 ---
 
-This repository provides the **static analysis portion** of the full tool described in the paper:
+## Development Status
+
+This repository includes only the **first stage** of the tool — the static inspection components.  
+The **second stage**, which will integrate **dynamic analysis techniques**, including runtime error detection, memory access tracking, and performance profiling, is **currently under active development**. This dynamic extension will be released in a future update after validation and benchmarking in HPC environments.
+
+---
+
+## Reference
+
+This static tool is introduced and discussed in detail in the following publication:
 
 > Saeed M. Altalhi, "An Architecture for a Tri-Programming Model-Based Parallel Hybrid Testing Tool," *Applied Sciences*, MDPI, vol. 13, no. 21, 11960, 2023.  
 > [DOI: 10.3390/app132111960](https://doi.org/10.3390/app132111960)
@@ -41,3 +50,4 @@ If you use or reference this tool, please cite the following publication:
 For questions, collaboration, or suggestions, please contact:  
 **Saeed M. Altalhi**  
 [saeed.altalhi@stu.kau.edu.sa](mailto:saeed.altalhi@stu.kau.edu.sa)
+

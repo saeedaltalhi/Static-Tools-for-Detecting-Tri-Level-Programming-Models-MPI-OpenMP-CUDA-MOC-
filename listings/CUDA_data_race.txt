@@ -1,0 +1,53 @@
+
+#include <iostream>
+#include <cuda.h>
+#include <cuda_runtime.h>
+
+using namespace std;
+
+__global__ void normalize_kernel(double* device_vecA, int size)
+{
+	// Divide each value of the vector A with the sum
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index < size) {
+		if (index == size - 1)
+			device_vecA[index] += 1;
+		else
+			device_vecA[index] += device_vecA[index];
+	}
+}
+
+int main (int argc, char** argv)
+{
+	// Initialize vector size and vector arrays
+	int vecSize = 100000;
+	double* vecA = (double*)malloc(vecSize * sizeof(double));
+	double* resultant_vec = (double*)malloc(vecSize * sizeof(double));
+	for (int i = 0; i < vecSize; i++)
+		vecA[i] = 1;
+
+	// Allocate device memory for vecA
+	double* device_vecA;
+	cudaMalloc((void**)&device_vecA, sizeof(double) * vecSize);
+
+	// Copy vecA from host to device
+	cudaMemcpy(device_vecA, vecA, sizeof(double) * vecSize, cudaMemcpyHostToDevice);
+
+	// Define block and grid dimensions
+	int blockSize = 32;
+	int numBlocks = (vecSize + blockSize - 1) / blockSize;
+
+	// Launch the kernel
+	normalize_kernel << <numBlocks, blockSize >> > (device_vecA, vecSize);
+
+	// Copy the results back to host
+	cudaMemcpy(resultant_vec, device_vecA, sizeof(double) * vecSize, cudaMemcpyDeviceToHost);
+
+	// Free device memory
+	cudaFree(device_vecA);
+
+	// Free host memory
+	free(vecA);
+
+	return 0;
+}

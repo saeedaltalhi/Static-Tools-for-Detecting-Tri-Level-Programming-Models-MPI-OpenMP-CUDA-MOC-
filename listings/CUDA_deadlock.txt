@@ -1,0 +1,135 @@
+#include <iostream>
+#include <stdlib.h>
+#include <mpi.h>
+#inlcude <omp.h>
+#include <cuda.h>
+
+#define BLOCK_SIZE 32
+#define COUNT 10000
+
+using namespace std;
+
+__global__ void nonce_kernel(int* nonce_array, int* transactions, int array_size) {
+
+	__shared__ int semaphore;
+  	semaphore = 0;
+  	__syncthreads();
+    	int index = blockDim.x * blockIdx.x + threadIdx.x;
+    	if (index < array_size - 1) {
+		while (true) {
+			int rand = rand() % 5;
+        		nonce_array[index] = rand * transactions[index];
+			nonce_array[index] += (nonce_array[index] * 2);
+    			int prev = atomicCAS(&semaphore,0,1);
+    			if (prev == 0) {
+      				//some critical section
+      				semaphore = 0;
+      				break;
+    			}
+		}
+    	}
+}
+
+int main (void)
+{
+	int commSz, myRank;
+	int trials = 1000;	
+	int thread_count = 4;
+
+	int num_blocks = ceil((float)trials / (float)BLOCK_SIZE);
+        dim3 dimGrid(num_blocks, 1, 1);
+        dim3 dimBlock(BLOCK_SIZE, 1, 1);
+
+	MPI_Init(NULL, NULL);
+	MPI_Comm_size(MPI_COMM_WORLD, &commSz);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+
+	MPI_Request request;
+	MPI_Status status;
+
+	omp_lock_t lock;
+	omp_init_lock(&lock);
+	
+	int c, result, buffer;
+	int mpiSum, ompSum = 0, local_sum = 0;
+
+	if (myRank == 0)
+		c = 5;
+		
+	MPI_Bcast(&c, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+	int* transactions = (int*)calloc(trials, sizeof(int));
+	int* nonce_array = (int*)calloc(trials, sizeof(int));
+	int* device_nonce_array;
+	int* device_transactions;	
+
+	while (true)
+	{
+		if (myRank == 1)
+		{
+			int a = 10;
+			int b = 10;
+			result = (a + b) * c;
+			MPI_Send(&result, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+		}
+		else if (myRank == 0)
+		{
+			MPI_Recv(&result, 1, MPI_INT, 2, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			printf("The result is:  %d", result);
+		}
+		break;
+	}
+	if (myRank == 2)
+	{
+		buffer = 100;
+		MPI_Isend(&buffer, 1, MPI_INT, 3, 1, MPI_COMM_WORLD, &request);
+		MPI_Wait(&request, &status);
+		buffer *= 2;	
+	}
+	else if (myRank == 3)
+	{
+		MPI_Irecv(&buffer, 1, MPI_INT, 2, 1, MPI_COMM_WORLD, &request);
+		MPI_Wait(&request, &status);
+	}
+
+#	pragma omp parallel
+	{	
+		bool flag = true;		
+		int thread_sum = 0;
+
+		for (int i = 0; i < COUNT; i++)
+			thread_sum += i;
+		
+		omp_set_lock(&lock);
+		ompSum += thread_sum;
+        	omp_unset_lock(&lock);		
+	} 
+
+#	pragma omp for num_threads(thread_count)
+	for (int i = 0; i < COUNT; i++)
+	{
+		local_sum += i;	
+	}	
+	MPI_Reduce(&local_sum, &mpiSum, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+
+	if (myRank == 0)
+	{
+		cudaMalloc((void**)&device_nonce_array, trials * sizeof(int));
+		cudaMalloc((void**)&device_transactions, trials * sizeof(int));		
+		cudaMemcpy(device_transactions, transactions, trials * sizeof(int), cudaMemcpyHostToDevice);
+		
+		while (true)
+		{
+			nonce_kernel << < dimGrid, dimBlock >> > (device_nonce_array, device_transactions, trials);
+			cudaDeviceSynchronize();
+		}	
+		cudaMemcpy(nonce_array, device_nonce_array, trials * sizeof(int), cudaMemcpyDeviceToHost);
+		cudaFree(device_nonce_array);
+		cudaFree(device_transactions);
+	}
+	
+	free(transactions);
+	free(nonce_array);
+
+	return 0;
+}

@@ -1,0 +1,34 @@
+ Run the program with 2 processes ideally
+
+#include iostream
+#include stdlib.h
+#include mpi.h
+
+using namespace std;
+
+int main(int argc, char argv)
+{
+	 Set up MPI environment
+	int myRank, commSize;
+	MPI_Init(&argc, &argv);
+	MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+	MPI_Comm_size(MPI_COMM_WORLD, &commSize);
+
+	 Simulating ping pong communication between processes 0 and 1
+	int ping = 1, pong = 1;
+	if (myRank == 0) {
+		ping = 10;
+		MPI_Send(&ping, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+		MPI_Recv(&pong, 1, MPI_DOUBLE, 1, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		cout  Rank   myRank    Ping =   ping    Pong =   pong  endl;
+	}
+	else if (myRank == 1) {
+		MPI_Recv(&ping, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		pong = ping  2;
+		MPI_Send(&pong, 1, MPI_INT, 0, 1, MPI_COMM_WORLD);
+		cout  Rank   myRank    Ping =   ping    Pong =   pong  endl;
+	}
+
+	MPI_Finalize();
+	return 0;
+}

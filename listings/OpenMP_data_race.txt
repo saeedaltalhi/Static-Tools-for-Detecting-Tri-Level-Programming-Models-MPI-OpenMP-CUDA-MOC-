@@ -1,0 +1,30 @@
+#include<omp.h>
+#include<stdlib.h>
+
+int main(void)
+{
+	int vecA[100];
+	int vecB[100];	
+	int resVec[100];	
+
+#	pragma omp for
+	for (int i = 0; i < 100; i++)
+	{
+		vecA[i] = 1;
+		vecB[i] = 2;
+		resVec[i] = vecA[i] + vecB[i];		
+	}
+#	pragma omp for
+	for (int i = 1; i < 99; i++)
+	{
+		resVec[i] = (resVec[i] * resVec[i + 1]) - resVec[i - 1]];		
+	}
+	int resSum = 0;
+	for (int i = 0; i < 100; i++)
+	{
+		resSum += resVec[i];		
+	}
+
+	printf("Sum = %d\n", resSum);
+	return 0;
+}

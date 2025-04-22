@@ -1,0 +1,28 @@
+#include<omp.h>
+#include<stdlib.h>
+
+int main(void)
+{
+	int vecSum = 0;
+	int vecA[100];
+	int vecB[100];	
+	int resVec[100];	
+
+#	pragma omp for
+	for (int i = 0; i < 100; i++)
+	{
+		vecA[i] = (i * 3 * 5);
+		vecB[i] = (i * 2 * 4);
+#		pragma omp critical
+		{
+			while(1)
+			{
+				vecSum = vecA[i] + vecB[i];
+			}
+		}
+	}
+
+
+	printf("Sum = %d\n", vecSum);
+	return 0;
+}

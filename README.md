@@ -1,5 +1,6 @@
 # Static-Tools-for-Detecting-Tri-Level-Programming-Models-MPI-OpenMP-CUDA-MOC-
 Static analysis components for Tri-level- programming model using MPI, OpenMP, and CUDA (MOC)
+
 ⸻ 
 This repository contains the static components of a tool designed to assist in the **detection and analysis of hybrid parallel programming models** that integrate **MPI**, **OpenMP**, and **CUDA**. The tool supports static inspection of source code to aid in debugging, bottleneck identification, and correctness verification in high-performance computing (HPC) environments.--- ## Overview Hybrid programming is increasingly used in modern HPC applications to maximize performance across multi-core CPUs and GPUs. However, debugging and verifying programs that combine **MPI (message passing)**, **OpenMP (shared-memory threading)**, and **CUDA (GPU acceleration)** presents significant challenges. 
 ⸻

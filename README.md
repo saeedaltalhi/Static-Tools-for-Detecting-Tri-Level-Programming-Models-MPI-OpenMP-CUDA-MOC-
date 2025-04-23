@@ -16,7 +16,7 @@ Hybrid programming is increasingly used in modern HPC applications to maximize p
 
 ## Development Status
 
-This repository includes only the **first stage** of the tool — the static inspection some components are done and the another currently under active **development**.  
+This repository includes only the **first stage** of the tool — Some components of the static inspection have been completed, and the **remaining parts will be finalized in the coming days**.  
 The **second stage**, which will integrate **dynamic analysis techniques**, including runtime error detection, memory access tracking, is **currently under active development**. This dynamic extension will be released in a future update after validation and benchmarking in HPC environments.
 
 ---

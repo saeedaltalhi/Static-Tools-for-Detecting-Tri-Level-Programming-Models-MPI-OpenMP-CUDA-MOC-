@@ -1,13 +1,4 @@
 
-#include "lexical.h"
-#include "MPI_state.h"
-#include "CUDA_state.h"
-#include "OMP_state.h"
-#include "ListErrors.h"
-#include <time.h>
-
-/* MAIN */
-/* ----------------------------------------------------- */
 int main(void)
 {
     // Array for storing lines of code
@@ -457,49 +448,6 @@ int main(void)
                             break;
                     }
 
-                    // Extract the code line containing MPI_Recv
-                    string codeLine = codeLines[recvLineNumber];
-
-                    // Separate the words within brackets at commas
-                    vector <string> separatedWords = separateAtCommas(codeLine);
-
-                    // Determine the length
-                    int vecLength = size(separatedWords);
-
-                    // If receive is inside a for loop
-                    if (forLoopSize != 1)
-                    {
-                        for (int k = 1; k < forLoopSize; k++)
-                        {
-                            // Determine source rank as string
-                            string source = to_string(k);
-
-                            // Check the grammar of this MPI_Recv
-                            grammar_MPI_Recv mpiRecv;
-
-                            // MPI_Recv must have 7 arguments
-                            if (vecLength != 7)
-                            {
-                                returnMessage message;
-                                message.errorLine = recvLineNumber;
-                                message.Error = "\t(MPI) SYNTAX: Invalid number of arguments of MPI_Recv";
-                                message.Check = false;
-                                message.Potential = false;
-                                messagesData.push_back(message);
-                            }
-                            else
-                            {
-                                // Store MPI_Recv data in structure
-                                mpiRecv.recvID = recvID++;
-                                mpiRecv.recvLineNumber = recvLineNumber;
-                                mpiRecv.recvBuffer = separatedWords[0];
-                                mpiRecv.recvCount = separatedWords[1];
-                                mpiRecv.recvDatatype = separatedWords[2];
-                                mpiRecv.recvSource = source;
-                                mpiRecv.recvTag = separatedWords[4];
-                                mpiRecv.recvCommunicator = separatedWords[5];
-                                mpiRecv.recvStatus = separatedWords[6];
-                                mpiRecv.correspondingSend = 0;
 
                                 // Test whether there is a corresponsding send for this MPI_Recv
                                 returnMessage message = Check_MPI_Recv(mpiRecv, codeWords, codeLines, startLine, mpiRank, receiverRank);
@@ -534,15 +482,7 @@ int main(void)
                         {
                             // Store MPI_Recv data in structure
                             mpiRecv.recvID = recvID++;
-                            mpiRecv.recvLineNumber = recvLineNumber;
-                            mpiRecv.recvBuffer = separatedWords[0];
-                            mpiRecv.recvCount = separatedWords[1];
-                            mpiRecv.recvDatatype = separatedWords[2];
-                            mpiRecv.recvSource = separatedWords[3];
-                            mpiRecv.recvTag = separatedWords[4];
-                            mpiRecv.recvCommunicator = separatedWords[5];
-                            mpiRecv.recvStatus = separatedWords[6];
-                            mpiRecv.correspondingSend = 0;
+                            
 
                             // Test whether there is a corresponsding send for this MPI_Recv
                             returnMessage message = Check_MPI_Recv(mpiRecv, codeWords, codeLines, startLine, mpiRank, receiverRank);
@@ -571,11 +511,7 @@ int main(void)
                     else
                     {
                         returnMessage message;
-                        message.errorLine = i;
-                        message.Error = "\t(MPI) Using MPI Commands WITHOUT PROPER MPI INITIALIZATION";
-                        message.Check = false;
-                        message.Potential = false;
-                        messagesData.push_back(message);
+                        
                     }
                 }
             }
@@ -611,44 +547,10 @@ int main(void)
                                 }
                             }
                         }
-                        if (senderRank != "NULL")
-                            break;
-                    }
-                    // Extract the code line containing MPI_Isend
-                    string codeLine = codeLines[IsendLineNumber];
-
-                    // Separate the words within brackets at commas
-                    vector <string> separatedWords = separateAtCommas(codeLine);
-
-                    // Determine the length
-                    int vecLength = size(separatedWords);
-
-                    // Check the grammar of this MPI_Send
-                    grammar_MPI_Isend mpiIsend;
-
-                    // MPI_Isend must have 6 arguments
-                    if (vecLength != 7)
-                    {
-                        returnMessage message;
-                        message.errorLine = IsendLineNumber;
-                        message.Error = "\t(MPI) SYNTAX: Invalid number of arguments of MPI_Isend";
-                        message.Check = false;
-                        message.Potential = false;
-                        messagesData.push_back(message);
-                    }
-                    else
-                    {
+                       
                         // Store MPI_Isend data in structure
                         mpiIsend.IsendID = IsendID++;
-                        mpiIsend.IsendLineNumber = IsendLineNumber;
-                        mpiIsend.IsendBuffer = separatedWords[0];
-                        mpiIsend.IsendCount = separatedWords[1];
-                        mpiIsend.IsendDatatype = separatedWords[2];
-                        mpiIsend.IsendDestination = separatedWords[3];
-                        mpiIsend.IsendTag = separatedWords[4];
-                        mpiIsend.IsendCommunicator = separatedWords[5];
-                        mpiIsend.IsendRequest = separatedWords[6];
-                        mpiIsend.correspondingIReceive = 0;
+                        m
 
                         // Test whether there is a corresponsding receive for this MPI_Isend
                         returnMessage message = Check_MPI_Isend(mpiIsend, codeWords, codeLines, numLines, mpiRank, senderRank);
@@ -692,34 +594,7 @@ int main(void)
                                 message1.Check = true;
                                 message1.Potential = false;
                                 messagesData.push_back(message1);
-                            }
-                        }
-                        // Save this MPI_Isend's data in mpiIsendData vector
-                        mpiIsendData.push_back(mpiIsend);   
-                    }
-                }
-                else
-                {
-                    if (mpiHeaderCheck == false)
-                    {
-                        returnMessage message;
-                        message.errorLine = i;
-                        message.Error = "\t(MPI) <mpi.h> HEADER file NOT INCLUDED";
-                        message.Check = false;
-                        message.Potential = false;
-                        messagesData.push_back(message);
-                    }
-                    else
-                    {
-                        returnMessage message;
-                        message.errorLine = i;
-                        message.Error = "\t(MPI) Using MPI Commands WITHOUT PROPER MPI INITIALIZATION";
-                        message.Check = false;
-                        message.Potential = false;
-                        messagesData.push_back(message);
-                    }
-                }
-            }
+                         }
             // If an MPI_Irecv is found
             else if (codeWords[i][j] == "MPI_Irecv")
             {
@@ -806,24 +681,7 @@ int main(void)
                 }
                 else
                 {
-                    if (mpiHeaderCheck == false)
-                    {
-                        returnMessage message;
-                        message.errorLine = i;
-                        message.Error = "\t(MPI) <mpi.h> HEADER file NOT INCLUDED";
-                        message.Check = false;
-                        message.Potential = false;
-                        messagesData.push_back(message);
-                    }
-                    else
-                    {
-                        returnMessage message;
-                        message.errorLine = i;
-                        message.Error = "\t(MPI) Using MPI Commands WITHOUT PROPER MPI INITIALIZATION";
-                        message.Check = false;
-                        message.Potential = false;
-                        messagesData.push_back(message);
-                    }
+                 
                 }
             }
             // if MPI_Bcast is found
@@ -998,21 +856,8 @@ int main(void)
                         message.Potential = false;
                         messagesData.push_back(message);
                     }
-                    else
-                    {
-                        // Store DIMS data in structure
-                        DIMS.dimsLineNumber = i;
-                        DIMS.xDim = separatedWords[0];
-                        DIMS.yDim = separatedWords[1];
-                        if (vecLength > 2)
-                            DIMS.zDim = separatedWords[2];
-                        else
-                            DIMS.zDim = "NULL";
-
-                        // Save this DIMS's data in cudaDIMS vector
-                        cudaDimsData.push_back(DIMS);
-                    }
-                }
+                    
+                
                 else
                 {
                     returnMessage message;
@@ -1071,19 +916,7 @@ int main(void)
                             break;
                         }
                     }
-                    if (isDeadlockCUDA == false)
-                    {
-                        returnMessage message1;
-                        message1.errorLine = kernelLineNumber;
-                        message1.Error = "\t(CUDA) No deadlock";
-                        message1.Check = true;
-                        message1.Potential = false;
-                        messagesData.push_back(message1);
-                    }
-
-                    // Search where the kernel function is being called
-                    for (int k = kernelLineNumber + 1; k < numLines; k++)
-                    {
+                    
                         for (int l = 0; l < MAX_WORDS_PER_LINE; l++)
                         {
                             if (codeWords[k][l] == kernelFuncName)
@@ -1153,45 +986,10 @@ int main(void)
                                 }
                                 else
                                 {
-                                    // Check if the kernel arguments contain an array or pointer variable
-                                    for (int m = 0; m < kernelArgs; m++)
-                                    {
-                                        string argOfKernel = separatedWords[m];
-                                        returnMessage message = isCorrect(argOfKernel, codeWords, codeLines, callLineNumber);
-                                        messagesData.push_back(message);
-                                    }
-                                }
-                                bool threadSync = false;
-                                for (int m = callLineNumber + 1; m < callLineNumber + 4; m++)
-                                {
-                                    for (int n = 0; n < MAX_WORDS_PER_LINE; n++)
-                                    {
-                                        if (codeWords[m][n] == "cudaDeviceSynchronize" || codeWords[m][n] == "__syncthreads")
-                                        {
-                                            threadSync = true;
-                                            break;
+                                    
                                         }
                                     }
-                                    if (threadSync == true)
-                                        break;
-                                }
-                                if (threadSync == false)
-                                {
-                                    returnMessage message;
-                                    message.errorLine = k + 1;
-                                    message.Error = "\t(CUDA) DATA RACE: Threads are not being synchronized";
-                                    message.Check = false;
-                                    message.Potential = false;
-                                    messagesData.push_back(message);
-                                }
-                                else
-                                {
-                                    returnMessage message;
-                                    message.errorLine = k + 1;
-                                    message.Error = "\t(CUDA) No race condition";
-                                    message.Check = true;
-                                    message.Potential = false;
-                                    messagesData.push_back(message);
+
                                 }
                             }
                         }
@@ -1218,37 +1016,7 @@ int main(void)
                     // Check the grammar of this cudaMalloc
                     grammar_cudaMalloc MallocCUDA;
 
-                    // cudaMalloc must have 2 arguments
-                    if (vecLength != 2)
-                    {
-                        returnMessage message;
-                        message.errorLine = i + 1;
-                        message.Error = "\t(CUDA) SYNTAX: Invalid number of arguments in cudaMalloc";
-                        message.Check = false;
-                        message.Potential = false;
-                        messagesData.push_back(message);
-                    }
-                    else
-                    {
-                        // Store cudaMalloc data in structure
-                        MallocCUDA.mallocLineNumber = mallocLineNumber;
-                        MallocCUDA.devPtr = separatedWords[0];
-                        MallocCUDA.size = separatedWords[1];
-
-                        // Save this cudaMalloc's data in cudaMallocData vector
-                        cudaMallocData.push_back(MallocCUDA);
-                    }
-                }
-                else
-                {
-                    returnMessage message;
-                    message.errorLine = i + 1;
-                    message.Error = "\t(CUDA) <cuda.h> HEADER file NOT INCLUDED";
-                    message.Check = false;
-                    message.Potential = false;
-                    messagesData.push_back(message);
-                }             
-            }
+                   
             // if cudaMemcpy is found
             else if (codeWords[i][j] == "cudaMemcpy")
             {
@@ -1288,20 +1056,7 @@ int main(void)
                         memCpyCUDA.count = separatedWords[2];
                         memCpyCUDA.kind = separatedWords[3];
 
-                        // Save this cudaMemcpy's data in cudaMemcpy vector
-                        cudaMemcpyData.push_back(memCpyCUDA);
-                    }
-                }
-                else
-                {
-                    returnMessage message;
-                    message.errorLine = i + 1;
-                    message.Error = "\t(CUDA) <cuda.h> HEADER file NOT INCLUDED";
-                    message.Check = false;
-                    message.Potential = false;
-                    messagesData.push_back(message);
-                }             
-            }
+                    
             // If omp_lock_init is found
             else if (codeWords[i][j] == "omp_init_lock")
             {
@@ -1390,38 +1145,6 @@ int main(void)
                             // Identify the omp for loop variable
                             ompForLoopVariable = Identify_Loop_Var(codeLines, pragmaLineNumber);
 
-                            // Check for DATA RACE in the omp for loop
-                            returnMessage message2 = detectRaceCondOpenMP(ompForLoopVariable, codeLines, pragmaLineNumber + 1);
-                            messagesData.push_back(message2);
-
-                            // Check that there is no 'omp barrier' inside the parallel for loop
-                            for (int a = pragmaLineNumber; a < numLines; a++)
-                            {
-                                for (int b = 0; b < MAX_WORDS_PER_LINE; b++)
-                                {
-                                    if (codeWords[a][b] == "barrier")
-                                    {
-                                        returnMessage message3;
-                                        message3.errorLine = a + 1;
-                                        message3.Error = "\t(OpenMP) DEADLOCK: Cannot have a barrier inside a parallel omp for loop";
-                                        message3.Check = false;
-                                        message3.Potential = false;
-                                        messagesData.push_back(message3);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            returnMessage message;
-                            message.errorLine = pragmaLineNumber + 1;
-                            message.Error = "\t(OpenMP) 'omp for' call must be followed by a 'for' loop";
-                            message.Check = false;
-                            message.Potential = false;
-                            messagesData.push_back(message);
-                        }                       
-                    }
                     else if (foundOmpParallelSections != string::npos)
                     {
                         OutFileStatic << "'omp sections' found at line " << pragmaLineNumber << endl << endl;
@@ -1490,10 +1213,7 @@ int main(void)
                         bool isLiveLock = false;
                         for (int l = pragmaLineNumber + 1; l < pragmaLineNumber + 20; l++)
                         {
-                            // Search for a while (flag) statement
-                            string whileFlagLine = codeLines[l];
-                            // Remove whitespace characters from the line
-                            whileFlagLine.erase(remove_if(whileFlagLine.begin(), whileFlagLine.end(), ::isspace), whileFlagLine.end());
+                            
 
                             // Check if the modified string contains "while (flag)"
                             string searchString1 = "while(flag)";
@@ -1554,27 +1274,7 @@ int main(void)
                             }
                         }
 
-                        // Check if the next line starts with '{' 
-                        bool startsWithBracket = checkOmpParallel(codeLines, pragmaLineNumber);
-                        if (startsWithBracket == true)
-                        {
-                            returnMessage message;
-                            message.errorLine = pragmaLineNumber + 1;
-                            message.Error = "\t(OpenMP) Correct 'omp parallel' call";
-                            message.Check = true;
-                            message.Potential = false;
-                            messagesData.push_back(message);
-                        }
-                        else
-                        {
-                            returnMessage message;
-                            message.errorLine = pragmaLineNumber + 1;
-                            message.Error = "\t(OpenMP) 'omp parallel' must be followed by code enclosed in {}";
-                            message.Check = false;
-                            message.Potential = false;
-                            messagesData.push_back(message);
-                        }
-                        // Check if the critical section of the code is protected with locks
+                        critical section of the code is protected with locks
                         bool lockFound = false;
                         bool nestedFor = false;
                         bool criticalScenario = true;
@@ -1647,23 +1347,7 @@ int main(void)
                             // Remove whitespace characters from the line
                             whileFlagLine.erase(remove_if(whileFlagLine.begin(), whileFlagLine.end(), ::isspace), whileFlagLine.end());
 
-                            // Check if the modified string contains "while (flag)"
-                            string searchString1 = "while(flag)";
-                            size_t found1 = whileFlagLine.find(searchString1);
-
-                            // If found, we have a potential livelock situation     
-                            if (found1 != std::string::npos)
-                            {
-                                returnMessage message1;
-                                message1.errorLine = l + 1;
-                                message1.Error = "\t(OpenMP) LIVELOCK: Threads stuck in an infinite loop trying to acquire lock";
-                                message1.Check = false;
-                                message1.Potential = false;
-                                messagesData.push_back(message1);
-                                isLiveLock = true;
-                                break;
-                            }
-                        }
+                            
                         if (isLiveLock == false)
                         {
                             returnMessage message1;
@@ -1753,19 +1437,7 @@ int main(void)
                         for (int a = setLockLineNumber + 1; a < numLines; a++)
                         {
                             string bracketLine = codeLines[a];
-                            // Remove all spaces and tabs from the string
-                            bracketLine.erase(std::remove_if(bracketLine.begin(), bracketLine.end(), [](unsigned char c) {
-                                return std::isspace(c);
-                                }), bracketLine.end());
-                            if (bracketLine == "}")
-                            {
-                                returnMessage message;
-                                message.errorLine = a;
-                                message.Error = "\t(OpenMP) DEADLOCK: No omp_unset_lock found before the end of the OpenMP region";
-                                message.Check = false;
-                                message.Potential = false;
-                                messagesData.push_back(message);
-                            }
+                            
                             for (int b = 0; b < MAX_WORDS_PER_LINE; b++)
                             {
                                 // If another set lock appears before unset
@@ -1800,48 +1472,9 @@ int main(void)
                         }
                         if (foundUnset == true)
                         {
-                            // check if the omp_unset_lock is inside an if statement
-                            if (codeWords[unsetLockLine - 1][0] == "if")
-                            {
-                                returnMessage message;
-                                message.errorLine = i;
-                                message.Error = "\t(OpenMP) DEADLOCK: omp_unset_lock is inside an if statement";
-                                message.Check = false;
-                                message.Potential = false;
-                                messagesData.push_back(message);
-                            }
-                            else
-                            {
-                                returnMessage message;
-                                message.errorLine = i;
-                                message.Error = "\t(OpenMP) Correct usage of lock and unlock";
-                                message.Check = true;
-                                message.Potential = false;
-                                messagesData.push_back(message);
-                            }
-                        }
-                        else
-                        {
-                            returnMessage message;
-                            message.errorLine = i;
-                            message.Error = "\t(OpenMP) DEADLOCK: OMP lock is set but never unset";
-                            message.Check = false;
-                            message.Potential = false;
-                            messagesData.push_back(message);
-                        }
-                    }
-                    else
-                    {
-                        returnMessage message;
-                        message.errorLine = i;
-                        message.Error = "\t(OpenMP) Setting LOCK without intializing it";
-                        message.Check = false;
-                        message.Potential = false;
-                        messagesData.push_back(message);
-                    }
-                }
-                else
-                {
+                            
+                       
+            
                     returnMessage message;
                     message.errorLine = i;
                     message.Error = "\t(OpenMP) <omp.h> HEADER file NOT INCLUDED";
@@ -1851,63 +1484,7 @@ int main(void)
                 }             
             }
         }
-        // Search for a while (true) statement
-        string whileTrueLine = codeLines[i];
-        // Remove whitespace characters from the line
-        whileTrueLine.erase(std::remove_if(whileTrueLine.begin(), whileTrueLine.end(), ::isspace), whileTrueLine.end());
-
-        // Check if the modified string contains "while (true)"
-        string searchString1 = "while(true)";
-        size_t found1 = whileTrueLine.find(searchString1);
-
-        // If found, search for a break
-        bool foundBreak = false;
-        bool isCudaWhile = false;
-        if (found1 != std::string::npos)
-        {
-            for (int c = i + 1; c < i + 20; c++)
-            {
-                for (int d = 0; d < MAX_WORDS_PER_LINE; d++)
-                {
-                    if (codeWords[c][d] == kernelFuncName)
-                    {
-                        isCudaWhile = true;
-                        break;
-                    }
-                    else if (codeWords[c][d] == "break")
-                    {
-                        foundBreak = true;
-                        break;
-                    }
-                }
-                if (isCudaWhile == true || foundBreak == true)
-                    break;
-            }
-            if (isCudaWhile == false)
-            {
-                if (foundBreak == false)
-                {
-                    returnMessage message;
-                    message.errorLine = i;
-                    message.Error = "\t(MPI) LIVELOCK: MPI processes are stuck in an infinite loop exchanging messages";
-                    message.Check = false;
-                    message.Potential = false;
-                    messagesData.push_back(message);
-                }
-                else
-                {
-                    returnMessage message;
-                    message.errorLine = i;
-                    message.Error = "\t(MPI) No livelock";
-                    message.Check = true;
-                    message.Potential = false;
-                    messagesData.push_back(message);
-                }
-            }
-        }
-    }
-    // Stop the clock
-    end = clock();
+        
 
     // Print out the error messages on screen
     printErrorMessages(messagesData);

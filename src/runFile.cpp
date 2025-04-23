@@ -4,7 +4,6 @@
 #include "CUDA_state.h"
 #include "OMP_state.h"
 #include "ListErrors.h"
-#include "dynamic.h"
 #include <time.h>
 
 /* MAIN */
@@ -1913,17 +1912,6 @@ int main(void)
     // Print out the error messages on screen
     printErrorMessages(messagesData);
 
-    // Write to Output file
-    CreateOutputFiles(messagesData, mpiSendData, mpiRecvData,
-        mpiIsendData, mpiIrecvData, mpiBcastData, 
-        mpiReduceData, cudaMallocData, cudaMemcpyData);
-
-    // Launch the dynamic part for evaluation of potential errors
-    ExecuteDynamic();
-
-    // Print time taken
-    cpu_time_used = ((double)(end - start)) / CLOCKS_PER_SEC;
-    cout << endl << "Time taken: " << cpu_time_used << " seconds" << endl;
 
     return 0;
 }

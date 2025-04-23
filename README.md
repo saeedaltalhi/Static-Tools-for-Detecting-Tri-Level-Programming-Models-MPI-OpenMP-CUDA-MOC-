@@ -46,7 +46,7 @@ If you use or reference this tool, please cite the following publication:
 ---
 
 ## Contact
-
+- This project is for educational purposes only and not for commercialization
 For questions, collaboration, or suggestions, please contact:  
 **Saeed M. Altalhi**  
 [saeed.altalhi@stu.kau.edu.sa](mailto:saeed.altalhi@stu.kau.edu.sa)

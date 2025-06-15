@@ -55,5 +55,5 @@ This project is for **educational and research use only**, not for commercial ap
 
 If you’re interested in using or learning more about the tool, or if you have questions, you can reach out by email:  
 **Saeed M. Altalhi** 
-(mailto:saeed.altalhi@stu.kau.edu.sa)
+(mailto:saeedaltalhi8@gmail.com)
 

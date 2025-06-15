@@ -1,53 +1,59 @@
-# Static-Tools-for-Detecting-Tri-Level-Programming-Models-MPI-OpenMP-CUDA(MOC)
+# Static Tools for Detecting Tri-Level Programming Models (MPI + OpenMP + CUDA)
 
-**Static analysis components for Tri-level programming model using MPI, OpenMP, and CUDA (MOC)**
+## Static Analysis for Tri-Level Programming with MPI, OpenMP, and CUDA
 
----
-
-This repository contains the **static components** of a tool designed to assist in the **detection and analysis of hybrid parallel programming models** that integrate **MPI**, **OpenMP**, and **CUDA**. The tool supports static inspection of source code to aid in debugging, bottleneck identification, and correctness verification in high-performance computing (HPC) environments.
+This repository includes part of a tool developed to help analyze and debug hybrid parallel programs that combine **MPI**, **OpenMP**, and **CUDA** in C++. It focuses specifically on the **static analysis** side of things — going through the code before it runs to find potential problems, check for correctness, and highlight performance issues in high-performance computing (HPC) environments.
 
 ---
 
-## Overview
+## Why This Matters
 
-Hybrid programming is increasingly used in modern HPC applications to maximize performance across multi-core CPUs and GPUs. However, debugging and verifying programs that combine **MPI (message passing)**, **OpenMP (shared-memory threading)**, and **CUDA (GPU acceleration)** presents significant challenges.
-
----
-
-## Development Status
-
-This repository includes only the **first stage** of the tool — Some components of the static inspection have been completed, and the **remaining parts will be finalized in the coming days**.  
-The **second stage**, which will integrate **dynamic analysis techniques**, including runtime error detection, memory access tracking, is **currently under active development**. This dynamic extension will be released in a future update after validation and benchmarking in HPC environments.
+More and more HPC applications rely on a mix of CPU and GPU programming to get the most out of today’s hardware. Combining message-passing (MPI), shared-memory threading (OpenMP), and GPU acceleration (CUDA) can be powerful, but it also makes programs harder to debug. Catching issues before they cause failures is tricky when all three models are involved — and that’s what this tool is trying to help with.
 
 ---
 
-## Reference
+## What's Included
 
-This static tool is introduced and discussed in detail in the following publication:
+This repository version contains work from the **first stage** of development. Some components for static inspection have been done and are included here. A few more are still being finalized and will be added soon.
 
-> Saeed M. Altalhi, "An Architecture for a Tri-Programming Model-Based Parallel Hybrid Testing Tool," *Applied Sciences*, MDPI, vol. 13, no. 21, 11960, 2023.  
+There’s also a **second stage** on the way — one that adds **dynamic testing**. That part will focus on catching run-time errors, tracking memory behavior, and watching how the program behaves while it’s running. It’s still being tested and benchmarked for HPC environments, so it’ll be released once it’s ready.
+
+> 🔒 **Note on Access:**  
+> This tool has been sold. Based on the buyer’s request, the source code is not shared publicly. Access may be given for academic or research purposes, but only with prior permission.
+
+---
+
+## Published Work
+
+Details about this tool, its design, and its testing approach are described in the following publication:
+
+> Saeed M. Altalhi, *"An Architecture for a Tri-Programming Model-Based Parallel Hybrid Testing Tool,"*  
+> Applied Sciences, MDPI, vol. 13, no. 21, 11960, 2023.  
 > [DOI: 10.3390/app132111960](https://doi.org/10.3390/app132111960)
 
 ---
 
 ## License
 
-This repository is released under the MIT License for open-access research and development.
+This project is released under the **MIT License**, for use in academic and research settings.
 
 ---
 
-## Citation
+## How to Cite
 
-If you use or reference this tool, please cite the following publication:
+If you reference this tool in your work, please cite the publication below:
 
-> Saeed M. Altalhi, “An Architecture for a Tri-Programming Model-Based Parallel Hybrid Testing Tool,” *Applied Sciences*, MDPI, vol. 13, no. 21, 11960, 2023.  
+> Saeed M. Altalhi, *"An Architecture for a Tri-Programming Model-Based Parallel Hybrid Testing Tool,"*  
+> Applied Sciences, MDPI, vol. 13, no. 21, 11960, 2023.  
 > [DOI: 10.3390/app132111960](https://doi.org/10.3390/app132111960)
 
 ---
 
 ## Contact
-- This project is for educational purposes only and not for commercialization, 
-For questions, collaboration, or suggestions, or if you need to get access to source code you can please contact:  
-**Saeed M. Altalhi**  
-[saeed.altalhi@stu.kau.edu.sa](mailto:saeed.altalhi@stu.kau.edu.sa)
+
+This project is for **educational and research use only**, not for commercial applications.
+
+If you’re interested in using or learning more about the tool, or if you have questions, you can reach out by email:  
+**Saeed M. Altalhi** 
+(mailto:saeed.altalhi@stu.kau.edu.sa)
 
